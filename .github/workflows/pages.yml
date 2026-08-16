@@ -1,0 +1,70 @@
+# GitHub Pages 部署。
+#
+# ⚠️ 关键安全点：**Pages 站点的 URL 是公开的，即使仓库是私有的**
+# （GitHub 官方：站点访问控制仅 Enterprise Cloud 提供）。
+# 所以绝不能把仓库根目录整个发出去——那样 PROGRESS.md / BUGS.md / docs/ / supabase/*.sql
+# 都能被任何人直接抓到，里面有真实商家名、RM 姓名、成本金额与分数线。
+#
+# 这里只挑站点运行真正需要的文件进 _site/：index.html + src/。
+# 其余一律不发布：data/（本来就没入库）、scripts/、supabase/、docs/、
+# 以及 PROGRESS / BUGS / CLAUDE / 需求文档 等内部台账。
+#
+# 站点零构建步骤（原生 ES Modules），所以「构建」就是一次拷贝。
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 只挑站点必需文件（内部台账与脚本一律不发布）
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r src _site/
+          # 兜底自查：产物里出现任何本不该发布的东西就让流水线红掉，
+          # 而不是安静地把内部资料发到公网上
+          for forbidden in PROGRESS.md BUGS.md CLAUDE.md 需求文档.md docs scripts supabase data backups; do
+            if [ -e "_site/$forbidden" ]; then
+              echo "::error::_site 里出现了不该发布的 $forbidden"
+              exit 1
+            fi
+          done
+          # 密钥自查：产物里只允许出现设计上公开的 Publishable key
+          if grep -rIn "sb_secret_\|service_role" _site/ ; then
+            echo "::error::发布产物里出现了 Secret key 相关内容"
+            exit 1
+          fi
+          echo "将发布的文件："
+          find _site -type f | sort
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传站点
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: 发布
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,688 @@
+/* 设计 tokens 见 docs/设计方案.md V2。
+   高端操作定义：留白大一档；字重仅 400/600；分隔线 0.5px；无阴影/渐变/卡片叠卡片；tabular-nums；无信息不上色。 */
+
+:root {
+  /* 品牌与等级（橙，唯一来源 #FF6B00） */
+  --brand: #FF6B00;
+  --brand-deep: #C84E00;
+  --brand-light: #FFA45C;
+  --brand-light-ink: #8A4300;
+  --brand-wash: rgba(255, 107, 0, .09);
+  /* 状态与中性 */
+  --level-c: #98A0A8;
+  --alert: #D03B3B;
+  --action: #3987E5;
+  --ink: #1F2329;
+  --ink-2: #5C6470;
+  --ink-3: #8A919D;
+  --page: #F4F5F7;
+  --card: #FFFFFF;
+  --hairline: rgba(31, 35, 41, .14);
+  /* 档位标尺蓝阶（数据区，不上橙） */
+  --tier-1: #EDF0F3;
+  --tier-2: #86B6EF;
+  --tier-3: #3987E5;
+  --tier-4: #104281;
+
+  --font: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --maxw: 960px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--font);
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--page);
+  line-height: 1.6;
+}
+
+b, strong, th, .num-lg, .fw { font-weight: 600; }
+
+.num, .num-lg, td.n, .track-label {
+  font-variant-numeric: tabular-nums;
+}
+
+a { color: var(--action); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 0.5px solid var(--hairline);
+  border-radius: 6px;
+  padding: 6px 10px;
+  min-height: 36px;
+}
+
+/* ---------- 页头（品牌位，可用橙） ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--card);
+  border-top: 3px solid var(--brand); /* 全站品牌顶边（证书橙横带的极简回声） */
+  border-bottom: 0.5px solid var(--hairline);
+}
+.site-header .inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#vendor-select { max-width: 240px; text-overflow: ellipsis; }
+.vendor-search {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 0.5px solid var(--hairline);
+  border-radius: 6px;
+  font-size: 13px;
+  width: 190px;
+}
+.identity label { font-size: 12px; white-space: nowrap; }
+/* 语言切换器（品牌位相邻，用中性色，不抢等级橙） */
+.lang-switch { display: inline-flex; border: 0.5px solid var(--hairline); border-radius: 999px; overflow: hidden; }
+.lang-btn {
+  font-size: 11px;
+  letter-spacing: .06em;
+  padding: 5px 10px;
+  min-height: 28px;
+  color: var(--ink-3);
+  background: transparent;
+}
+.lang-btn:hover { color: var(--ink); background: #EDEFF2; }
+.lang-btn.active { background: var(--ink); color: #fff; font-weight: 600; }
+
+/* 两个评定期下拉成组，换行时一起走，不单独断开 */
+.period-group { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+#month-select { min-width: 78px; }
+#week-select { min-width: 150px; }
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--brand);
+  color: #fff;
+  display: grid; place-items: center;
+  font-weight: 600; font-size: 22px;
+}
+.logo-text { font-size: 18px; font-weight: 600; line-height: 1.25; letter-spacing: .01em; }
+.logo-text .alianza { color: var(--brand); }
+.logo-sub { font-size: 10px; color: var(--ink-3); letter-spacing: .22em; }
+
+.identity {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.identity .period-chip {
+  font-size: 12px;
+  color: var(--ink-2);
+  border: 0.5px solid var(--hairline);
+  border-radius: 999px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+/* draft 横幅 */
+.draft-banner {
+  background: var(--brand-wash);
+  color: var(--brand-deep);
+  font-size: 13px;
+  text-align: center;
+  padding: 7px 16px;
+}
+
+/* ---------- 导航 ---------- */
+.site-nav {
+  background: var(--card);
+  border-bottom: 0.5px solid var(--hairline);
+}
+.site-nav .inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+.site-nav a {
+  color: var(--ink-2);
+  font-size: 14px;
+  padding: 8px 18px;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: #EDEFF2;
+}
+.site-nav a:hover { text-decoration: none; color: var(--ink); background: #E2E5EA; }
+.site-nav a[aria-current="page"] {
+  color: #fff;
+  font-weight: 600;
+  background: var(--ink);
+}
+
+/* ---------- 主内容 ---------- */
+main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 56px 24px 80px;
+}
+.section { margin-bottom: 64px; }
+/* 章节标题：小字距导语 + 延伸细线（编辑感） */
+.section > h2 {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  letter-spacing: .28em;
+  margin-bottom: 22px;
+}
+.section > h2::after {
+  content: "";
+  flex: 1;
+  border-top: 0.5px solid var(--hairline);
+}
+/* 卡片内标题。全站原先没定义 h3，走浏览器默认（≈18.7px / 700），比正文和分节标题都大，
+   与「字重只用两档、层级靠字号与留白」的排版约定不符 → 统一到 15px / 600。 */
+h3 {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+/* 页级大标题（rules/performance 等页首） */
+.page-title {
+  font-size: 26px !important;
+  font-weight: 600;
+  color: var(--ink) !important;
+  letter-spacing: .02em !important;
+}
+.page-title::after { display: none !important; }
+.card {
+  background: var(--card);
+  border: 0.5px solid var(--hairline);
+  border-radius: 14px;
+  padding: 32px 36px;
+}
+.card + .card { margin-top: 18px; }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); font-size: 13px; }
+.small { font-size: 13px; }
+
+/* 总览主卡：顶部证书式品牌横带（品牌位可用橙） */
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 44px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 56px 44px 48px;
+}
+.hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 8px;
+  background: var(--brand);
+}
+.hero-kicker {
+  font-size: 11px;
+  letter-spacing: .32em;
+  color: var(--brand-deep);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.hero-main { flex: 1; min-width: 240px; }
+.points-label {
+  font-size: 12px;
+  letter-spacing: .3em;
+  color: var(--ink-3);
+}
+.num-lg {
+  font-size: 76px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.num-lg .unit { font-size: 18px; font-weight: 400; color: var(--ink-3); margin-left: 6px; }
+.hero-meta { margin-top: 16px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); }
+
+.delta-up { color: var(--ink); }
+.delta-down { color: var(--ink-2); }
+
+/* 距下一等级：完整四段等级尺（2026-08-16）。
+   段色用等级橙序阶 + C 灰，与徽章、全盘分布条同一套语义——这里的颜色承载「哪一段是哪一级」，
+   属于「颜色承载信息」的允许场景，不是给数据区上装饰色。 */
+.lp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 30px;   /* 给当前分标签留出位置 */
+}
+.lp-head .lp-gap { color: var(--action); font-weight: 600; }
+
+.lvbar-wrap { position: relative; max-width: 620px; }
+.lvbar {
+  display: flex;
+  height: 26px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lvbar-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: #fff;
+  min-width: 0;
+  transition: opacity .2s ease;
+}
+/* 非当前等级的段压暗，让当前所在段自己跳出来——靠明度而不是再加一种颜色 */
+.lvbar-seg:not(.current) { opacity: .38; }
+.lvbar-seg.lv-S { background: var(--brand-deep); }
+.lvbar-seg.lv-A { background: var(--brand); }
+.lvbar-seg.lv-B { background: var(--brand-light); color: var(--brand-light-ink); }
+.lvbar-seg.lv-C { background: var(--level-c); }
+.lvbar-seg span { opacity: .95; }
+
+/* 分数线刻度：细线 + 数字，落在段与段的交界处 */
+.lvbar-ticks { position: relative; height: 20px; }
+.lvbar-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: center;
+  white-space: nowrap;
+}
+.lvbar-tick i {
+  display: block;
+  width: 0.5px;
+  height: 5px;
+  margin: 0 auto 2px;
+  background: var(--ink-3);
+}
+
+/* 当前分数打点 */
+.lvbar-mark {
+  position: absolute;
+  top: -26px;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1;
+  pointer-events: none;
+}
+.lvbar-mark-label {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--card);
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.lvbar-mark i {
+  display: block;
+  width: 1px;
+  height: 32px;          /* 越过整条尺，读数一眼对得上 */
+  margin: 2px auto 0;
+  background: var(--ink);
+}
+@media (max-width: 520px) {
+  .lvbar-seg { font-size: 11px; }
+  .lvbar-tick { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .lvbar-seg { transition: none; } }
+
+/* 状态行 */
+.status-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  border: 0.5px solid var(--hairline);
+  border-radius: 999px;
+  padding: 4px 14px;
+  color: var(--ink-2);
+}
+.chip.alert { color: var(--alert); border-color: var(--alert); }
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+/* 关注项 */
+.focus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+/* .card + .card 的兄弟边距只用于纵向卡片流；网格内会造成第二张卡下坠错位（BUG-004） */
+.focus-grid > .card { margin-top: 0; }
+
+/* ---------- 档位标尺（数据区，蓝阶） ---------- */
+.tier-track { margin: 14px 0 4px; }
+.tier-track .bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  gap: 2px;
+}
+.tier-track .seg { background: var(--tier-1); }
+.tier-track .seg.t1 { background: var(--tier-1); }
+.tier-track .seg.t2 { background: var(--tier-2); }
+.tier-track .seg.t3 { background: var(--tier-3); }
+.tier-track .seg.t4 { background: var(--tier-4); }
+.tier-track .seg.current { outline: 2px solid var(--ink); outline-offset: 1px; }
+/* 0 分档标红（2026-08-14 用户要求）。注意：这是对设计约束「红只给红线/冻结」的一次扩展——
+   0 分档与红线同属"负面状态"，故复用警示赤；仍不用于任何装饰性目的。见 docs/设计方案.md §2。 */
+.tier-track .seg.zero { background: var(--alert); opacity: .3; }
+.tier-track .seg.zero.current { opacity: 1; }
+/* 每档得分标注 */
+.tier-track .scores { position: relative; height: 16px; margin-top: 4px; }
+.tier-track .tier-score {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.tier-track .tier-score.current { color: var(--ink); font-weight: 600; }
+.tier-track .tier-score.zero.current { color: var(--alert); }
+.tier-track .zero-warn { font-size: 12px; color: var(--alert); margin-top: 6px; }
+.tier-track .ticks {
+  position: relative;
+  height: 18px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.tier-track .tick { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.track-gap { font-size: 13px; color: var(--action); margin-top: 6px; }
+
+/* 带指针的标尺（指标明细完整版 + 建议/总览迷你版） */
+.tier-track.full .pointer-row,
+.tier-track.with-pointer .pointer-row { position: relative; height: 30px; }
+.tier-track.with-pointer .pointer-row { height: 26px; }
+.tier-track.with-pointer .ticks { margin-top: 4px; }
+.tier-track.with-pointer .track-label { margin-top: 2px; }
+.tier-track.full .pointer,
+.tier-track.with-pointer .pointer {
+  position: absolute;
+  transform: translateX(-50%);
+  bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.tier-track.with-pointer .pointer { font-size: 12px; }
+.tier-track.full .pointer i,
+.tier-track.with-pointer .pointer i {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+}
+.tier-track.full .bar { height: 12px; }
+.tier-track.full .ticks { margin-top: 4px; }
+
+/* 模拟器 */
+.sim-row { padding: 14px 0; border-bottom: 0.5px solid var(--hairline); }
+.sim-row:last-child { border-bottom: none; }
+.sim-row .sim-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sim-row input[type="range"] { width: 100%; accent-color: var(--action); margin-top: 10px; min-height: 28px; }
+.sim-result {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 20px 0 6px;
+}
+.sim-result .arrow { color: var(--ink-3); font-size: 20px; }
+/* Bonus 实时联动区（数据区 → 金额用石墨，涨跌用中性/警示，不上橙） */
+.sim-bonus {
+  border-top: 0.5px solid var(--hairline);
+  margin-top: 14px;
+  padding-top: 14px;
+}
+.sim-bonus-amount { font-size: 30px; font-weight: 600; color: var(--ink); transition: color .2s ease; }
+.sim-bonus-amount.up { color: var(--tier-4); }
+.sim-bonus-amount.down { color: var(--alert); }
+@media (prefers-reduced-motion: reduce) { .sim-bonus-amount { transition: none; } }
+.sim-points { font-size: 34px; font-weight: 600; }
+.strength-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.strength-chips .chip { color: var(--ink); }
+details.desc { margin-top: 6px; }
+details.desc summary { cursor: pointer; color: var(--ink-3); font-size: 13px; }
+details.desc p { color: var(--ink-2); font-size: 13px; margin-top: 6px; }
+
+/* 排名页范围切换（交互 = 晴空蓝） */
+.scope-btn {
+  font-size: 14px;
+  padding: 7px 18px;
+  border-radius: 999px;
+  background: #EDEFF2;
+  color: var(--ink-2);
+}
+.scope-btn.active { background: var(--action); color: #fff; font-weight: 600; }
+
+/* RM 全盘视图 */
+.pf-dist { display: flex; height: 34px; border-radius: 8px; overflow: hidden; gap: 2px; }
+.pf-dist-seg {
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  min-width: 34px;
+  white-space: nowrap;
+}
+/* 等级色阶与徽章一致：S 炙橙 → A 品牌橙 → B 浅杏 → C 岩灰 */
+.pf-dist-seg.lv-S { background: var(--brand-deep); }
+.pf-dist-seg.lv-A { background: var(--brand); }
+.pf-dist-seg.lv-B { background: var(--brand-light); color: var(--brand-light-ink); }
+.pf-dist-seg.lv-C { background: var(--level-c); }
+.pf-row { cursor: pointer; }
+.pf-row:hover { background: #F7F8FA; }
+.pf-row:focus-visible { outline: 2px solid var(--action); outline-offset: -2px; }
+.pf-up { color: var(--ink); font-weight: 600; }
+.pf-down { color: var(--alert); font-weight: 600; }
+
+/* 登录页 */
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--page);
+}
+.login-card { width: 100%; max-width: 400px; }
+.login-card input { width: 100%; }
+
+/* 管理后台表单 */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px 20px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+input[type="number"], input[type="text"], input[type="search"], textarea {
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--card);
+  border: 0.5px solid var(--hairline);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-height: 38px;
+}
+textarea { min-height: 56px; resize: vertical; }
+.tier-grid {
+  display: grid;
+  grid-template-columns: auto 110px auto 80px;
+  gap: 8px 12px;
+  align-items: center;
+  max-width: 560px;
+}
+.err-list { color: var(--alert); font-size: 13px; padding-left: 20px; margin-bottom: 14px; }
+.err-text { color: var(--alert); }
+.ok-text { color: var(--ink-2); }
+button:disabled, .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ---------- 表格 ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 0.5px solid var(--hairline); vertical-align: top; }
+th { color: var(--ink-3); font-size: 12px; letter-spacing: .08em; }
+td.n, th.n { text-align: right; }
+tr:last-child td { border-bottom: none; }
+.table-scroll { overflow-x: auto; }
+
+/* ---------- 徽章 ---------- */
+.badge-lg { flex-shrink: 0; }
+.badge-inline { display: inline-flex; align-items: center; gap: 6px; }
+.badge-corner {
+  font-size: 10px;
+  color: var(--brand-deep);
+  background: var(--brand-wash);
+  border-radius: 4px;
+  padding: 1px 6px;
+  vertical-align: top;
+}
+
+/* ---------- 空状态 ---------- */
+.empty-state {
+  text-align: center;
+  padding: 72px 24px;
+  color: var(--ink-2);
+}
+.empty-state .action { margin-top: 16px; }
+.btn {
+  display: inline-block;
+  background: var(--action);
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 14px;
+}
+.btn:hover { text-decoration: none; opacity: .92; }
+
+/* ---------- 页脚（品牌位） ---------- */
+.site-footer { margin-top: 48px; }
+.site-footer .notes {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 20px 24px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.footer-strip {
+  color: var(--brand);
+  font-size: 8px;
+  letter-spacing: .3em;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 6px 0;
+  border-top: 0.5px solid var(--hairline);
+  user-select: none;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 640px) {
+  main { padding: 28px 16px 56px; }
+  .card { padding: 20px; }
+  .hero-card { padding: 28px 20px; gap: 24px; }
+  .num-lg { font-size: 44px; }
+  .site-header .inner { padding: 10px 16px; }
+  .identity { margin-left: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* 模拟器档位刻度（2026-08-16）：滑块只说明「调到多少」，这条尺说明「调到多少能拿几分」。
+   段色沿用指标明细页的档位蓝阶，两处视觉语言一致。 */
+.sim-scale { margin-top: 8px; }
+.sim-scale-bars { display: flex; gap: 2px; height: 22px; }
+.sim-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  border-radius: 3px;
+  color: var(--ink-3);
+  font-size: 11px;
+  transition: opacity .15s ease;
+  opacity: .6;                      /* 非当前档压暗，靠明度而不是再换一种颜色；不低于 .6 以免字读不清 */
+}
+/* 档位色阶与指标明细页 .tier-track 完全一致：越靠满分越深 */
+.sim-seg.t1 { background: var(--tier-1); color: var(--ink-2); }
+/* t2 是浅蓝，白字对比度不足（约 2.2:1）→ 用深墨色 */
+.sim-seg.t2 { background: var(--tier-2); color: var(--ink); }
+.sim-seg.t3 { background: var(--tier-3); color: #fff; }
+.sim-seg.t4 { background: var(--tier-4); color: #fff; }
+/* 0 分档用警示红（同 .tier-track .seg.zero）：平时压暗，落进去才实色 */
+.sim-seg.zero { background: var(--alert); color: #fff; }
+/* 窄屏下最窄的一档只有 ~25px，标签必须能被剪掉而不是把整条尺顶宽 */
+.sim-seg { overflow: hidden; padding: 0 2px; }
+.sim-seg b { font-weight: 400; white-space: nowrap; }
+.sim-seg.current { opacity: 1; outline: 2px solid var(--ink); outline-offset: 1px; }
+.sim-seg.current b { font-weight: 600; }
+.sim-scale-ticks { position: relative; height: 16px; margin-top: 2px; }
+.sim-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.sim-next { margin-top: 8px; min-height: 18px; }
+@media (prefers-reduced-motion: reduce) { .sim-seg { transition: none; } }
+
+/* 规则页六项指标表：档位数字一律不折行（「500 – 1,250」被拆两行很难读），
+   指标定义列收窄，把宽度让给档位列。 */
+.rules-indicators td.n, .rules-indicators th.n { white-space: nowrap; }
+.rules-indicators col.c-ind { width: 40%; }
+.rules-indicators col.c-w { width: 8%; }
+.rules-indicators col.c-t { width: 13%; }
+@media (max-width: 900px) {
+  .rules-indicators col.c-ind { width: auto; }
+}
+
+/* 「当前等级无现金激励」是一句话，不该占金额位的 30px */
+.sim-bonus-amount.as-text { font-size: 15px; font-weight: 400; color: var(--ink-2); }
+
+/* 「一步就能升级」并入模拟器：与滑块列表之间用一条 0.5px 分隔，不另起卡片 */
+.sim-upgrade { margin-top: 20px; padding-top: 18px; border-top: 0.5px solid var(--hairline); }
+/* 能一步升级的那一行就地标注——这是全页最可操作的一句话，给它唯一的强调色 */
+.sim-next.can-upgrade { color: var(--ink-2); }
+.sim-upgrade-mark { color: var(--action); font-weight: 600; }

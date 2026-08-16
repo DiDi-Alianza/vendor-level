@@ -1,0 +1,34 @@
+# 敏感数据只用于本地开发，永不上传（部署后全部走 Supabase + RLS，见 docs/阶段二-部署与数据方案.md）
+# 内含：每商评级与逐项得分、RM 姓名、还款信用分、红线名单、首单日期、内部定线备选与目标
+data/
+
+# Supabase 密钥（service_role 绕过 RLS，泄漏等于裸库）
+scripts/.supabase_secrets.json
+
+# 本地数据快照备份（含全量评级数据，永不上传）
+backups/
+
+# 系统与编辑器
+Thumbs.db
+Desktop.ini
+~$*
+
+# 账号与初始密码清单（个人信息 + 凭据，永不入库；发放后应从本目录移走）
+账号密码.xlsx
+*账号*.xlsx
+*密码*.xlsx
+新账号初始密码.txt
+
+# ── 内部台账与业务文档：留在本地，不进公开仓库 ──
+# 里面有真实商家名、RM 姓名、成本金额、分数线与定线过程。
+# 仓库自 2026-08-16 起公开（组织为 GitHub Free，私有仓库不能发 Pages），
+# 这些文件必须排除；CLAUDE.md 仍需留在工作目录供后续会话读取。
+CLAUDE.md
+PROGRESS.md
+BUGS.md
+需求文档.md
+docs/
+
+# Python 缓存
+__pycache__/
+*.pyc
