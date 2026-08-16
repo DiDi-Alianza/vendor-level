@@ -3,7 +3,8 @@
 build_vendor_profile.py — 生成 data/vendor_profile.json
 
 输入：
-  01_原始数据/商基础信息/Vendor首单时间.xlsx   → 首单日期
+  01_原始数据/商基础信息/首单时间@0815.xlsx     → 首单日期（2026-08-16 起改用此版；
+                                                 源头已按拼写变体合并，多一列 code_variants）
   01_原始数据/商基础信息/Vendor_List_2026-08-05.xlsx → 显示名 / 城市 / 经营状态
   05_网站/data/rm_assignment.json              → RM 归属（已处理，不重新解析 xlsx）
   05_网站/data/vendors_2026_07.json            → 102 家主名单（vendor_code 以此为准）
@@ -39,7 +40,7 @@ def normalize(code):
 def load_first_orders():
     """同一 vendor 在源表里按拼写变体拆成多行（vendor_id 相同、日期范围不同）。
     首单日期取同组最早值。若同一归一化键下 vendor_id 不一致则不合并，记入 conflicts。"""
-    wb = openpyxl.load_workbook(RAW / "Vendor首单时间.xlsx", read_only=True, data_only=True)
+    wb = openpyxl.load_workbook(RAW / "首单时间@0815.xlsx", read_only=True, data_only=True)
     ws = wb["Sheet1"]
     rows = list(ws.iter_rows(values_only=True))
     wb.close()
