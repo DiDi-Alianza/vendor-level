@@ -2,10 +2,15 @@
 // 账号由主管理员分配（需求文档 3.x）；页面不提供注册、不提供密码重置自助入口。
 // 输入的凭据直接交给 Supabase Auth，前端不存密码、只存返回的 token。
 
-import { t } from "../i18n.js";
+import { t, LANGS, currentLang } from "../i18n.js";
 import { signIn } from "../supabase.js";
 
-export function renderLogin() {
+/**
+ * 登录页。语言切换器必须挂在这里单独一份——它在应用外壳之外，
+ * 未登录的人看不到头部那一套，只给中文等于把西语/英语用户挡在门外。
+ * @param {{email?: string}} prefill 换语言会重挂本页，把已输入的邮箱带回来（密码不带）
+ */
+export function renderLogin({ email = "" } = {}) {
   return `
   <div class="login-wrap">
     <form class="card login-card" id="login-form" autocomplete="on">
@@ -20,7 +25,8 @@ export function renderLogin() {
       <p class="faint small" style="margin-bottom:20px">${t("login.hint")}</p>
       <label class="field" style="margin-bottom:14px">
         <span class="faint small">${t("login.email")}</span>
-        <input type="email" id="login-email" name="email" autocomplete="username" required>
+        <input type="email" id="login-email" name="email" autocomplete="username" required
+               value="${email.replace(/"/g, "&quot;")}">
       </label>
       <label class="field" style="margin-bottom:20px">
         <span class="faint small">${t("login.password")}</span>
@@ -29,6 +35,11 @@ export function renderLogin() {
       <button type="submit" class="btn" style="width:100%" id="login-submit">${t("login.submit")}</button>
       <p id="login-error" class="small" style="color:var(--alert);margin-top:12px;min-height:18px"></p>
       <p class="faint small" style="margin-top:8px">${t("login.contact")}</p>
+      <div class="lang-switch login-lang" id="login-lang" role="group" aria-label="${t("lang.switch")}">
+        ${LANGS.map((l) => `<button type="button" class="lang-btn${
+          l === currentLang() ? " active" : ""}" data-lang="${l}" aria-pressed="${
+          l === currentLang()}">${l.toUpperCase()}</button>`).join("")}
+      </div>
     </form>
   </div>`;
 }

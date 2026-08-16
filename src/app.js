@@ -90,6 +90,26 @@ async function switchPeriod(type, id) {
   render();
 }
 
+/**
+ * 挂载登录页（含语言切换）。登录页在应用外壳之外，头部那套切换器不会渲染，
+ * 所以这里单独挂一份——否则未登录的西语/英语用户只能看中文。
+ * 换语言会重挂本页，已输入的邮箱带回来，密码不带（不在内存里留凭据）。
+ */
+function mountLogin() {
+  const email = document.getElementById("login-email")?.value ?? "";
+  app.innerHTML = renderLogin({ email });
+  bindLogin(boot);
+  document.querySelectorAll("#login-lang [data-lang]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (btn.dataset.lang === currentLang()) return;
+      state.lang = btn.dataset.lang;
+      saveState();
+      await initI18n(state.lang);
+      mountLogin();
+    });
+  });
+}
+
 async function boot() {
   // 语言：先读已保存的选择再初始化 i18n（缺译自动回退中文母本，见 src/i18n.js）
   try {
@@ -98,8 +118,7 @@ async function boot() {
   } catch {}
   await initI18n(state.lang);
   if (AUTH_ENABLED && !isSignedIn()) {
-    app.innerHTML = renderLogin();
-    bindLogin(boot);   // 登录成功后重新引导
+    mountLogin();      // 登录成功后重新引导
     return;
   }
   try {
@@ -111,8 +130,7 @@ async function boot() {
   } catch (e) {
     if (e?.code === "auth.required") {          // token 失效 → 回登录页，不展示空数据
       signOut();
-      app.innerHTML = renderLogin();
-      bindLogin(boot);
+      mountLogin();
       return;
     }
     const msg = e?.code === "auth.no_role" ? t("error.no_role")

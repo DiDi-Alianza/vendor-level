@@ -705,3 +705,6 @@ tr:last-child td { border-bottom: none; }
 .pf-scope .pf-scope-btn.active .faint { color: var(--page); opacity: .7; }
 /* 0 分档与风险家数用警示色：这里的颜色承载「需要处理」的信息 */
 .pf-risk { color: var(--alert); }
+
+/* 登录页的语言切换：放在卡片底部居中，与头部那套同一视觉语言 */
+.login-lang { justify-content: center; margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--hairline); }
