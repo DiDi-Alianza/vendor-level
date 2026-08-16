@@ -57,8 +57,10 @@ jobs:
           echo "将发布的文件："
           find _site -type f | sort
 
-      - name: 配置 Pages
+      - name: 配置 Pages（仓库公开后可由工作流自行开启，省去手工在 Settings 里点选）
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: 上传站点
         uses: actions/upload-pages-artifact@v3
