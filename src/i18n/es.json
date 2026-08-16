@@ -496,5 +496,18 @@
   "admin.history.local_only": "Los respaldos de versiones anteriores viven en la carpeta local rules_history/ y no son visibles en línea. La reversión también sigue el flujo de orden de cambio.",
   "admin.online_note": "Modo en línea: la simulación, el laboratorio y la consulta de datos funcionan con normalidad; guardar y revertir reglas está desactivado — la única fuente de verdad es data/rules.json y los cambios se reimportan tras seguir el flujo de orden de cambio.",
   "advice.sim_row_upgrade": "→ alcanzar este tramo te sube al nivel {level}",
-  "portfolio.flags_legend": "Estatus: Línea Roja = activada este mes, incentivo en efectivo congelado | Doble 0 = 0 puntos tanto en Pedidos Perfectos diarios como en Cumplimiento de Slots (falta volumen, no calidad de servicio) | Periodo de protección = socio nuevo, su nivel C no cuenta para la acumulación de terminación"
+  "portfolio.flags_legend": "Estatus: Línea Roja = activada este mes, incentivo en efectivo congelado | Doble 0 = 0 puntos tanto en Pedidos Perfectos diarios como en Cumplimiento de Slots (falta volumen, no calidad de servicio) | Periodo de protección = socio nuevo, su nivel C no cuenta para la acumulación de terminación",
+  "nav.overview_internal": "Detalle del socio",
+  "portfolio.by_city_title": "Comparativa por ciudad",
+  "portfolio.total_row": "Total",
+  "portfolio.h.city": "Ciudad",
+  "portfolio.h.count": "Socios",
+  "portfolio.h.avg_points": "POINTS promedio",
+  "portfolio.h.rank": "#",
+  "portfolio.h.indicator": "Indicador",
+  "portfolio.h.avg_score": "Puntos promedio",
+  "portfolio.h.avg_loss": "POINTS perdidos por socio",
+  "portfolio.score_dist_title": "Distribución de puntos por indicador",
+  "portfolio.score_dist_note": "Cuántos socios hay en cada tramo y qué proporción representan: el promedio solo no muestra la estructura. Ordenado por POINTS perdidos por socio, de mayor a menor.",
+  "portfolio.scope_all_btn": "Todos"
 }

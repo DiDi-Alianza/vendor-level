@@ -496,5 +496,18 @@
   "admin.history.local_only": "Version backups live in the local rules_history/ folder and are not visible online. Rollback also follows the change-order flow.",
   "admin.online_note": "Online mode: simulation, the sandbox and data browsing work as usual; saving and rolling back rules is disabled — data/rules.json is the single source of truth and changes are re-imported after going through the change-order flow.",
   "advice.sim_row_upgrade": "→ reaching this tier lifts you to level {level}",
-  "portfolio.flags_legend": "Status key: Red Line = triggered this month, cash incentive frozen | Double 0 = 0 points on both average daily Perfect Orders and Slot Compliance Rate (what's missing is volume, not service quality) | Protection period = new vendor, a level C does not count toward the termination tally"
+  "portfolio.flags_legend": "Status key: Red Line = triggered this month, cash incentive frozen | Double 0 = 0 points on both average daily Perfect Orders and Slot Compliance Rate (what's missing is volume, not service quality) | Protection period = new vendor, a level C does not count toward the termination tally",
+  "nav.overview_internal": "Vendor detail",
+  "portfolio.by_city_title": "City comparison",
+  "portfolio.total_row": "Total",
+  "portfolio.h.city": "City",
+  "portfolio.h.count": "Vendors",
+  "portfolio.h.avg_points": "Average POINTS",
+  "portfolio.h.rank": "#",
+  "portfolio.h.indicator": "Indicator",
+  "portfolio.h.avg_score": "Average points",
+  "portfolio.h.avg_loss": "POINTS lost per vendor",
+  "portfolio.score_dist_title": "Score distribution by indicator",
+  "portfolio.score_dist_note": "How many vendors sit in each tier and what share that is — an average alone hides the structure. Sorted by POINTS lost per vendor, highest first.",
+  "portfolio.scope_all_btn": "All"
 }

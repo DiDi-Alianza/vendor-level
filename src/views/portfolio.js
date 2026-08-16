@@ -85,30 +85,114 @@ export function renderPortfolio({ rules, roster, profilesByCode, period, scopeLa
     </div>
   </div>`;
 
-  // ---- 共性短板：名下哪些指标丢分最多 ----
-  const weakStats = activeIndicators(rules).map((rule) => {
-    const scores = rows.map((r) => r.scores[rule.key]);
-    const zeros = scores.filter((s) => s === 0).length;
-    const avgScore = scores.reduce((a, b) => a + b, 0) / n;
-    const loss = scores.reduce((a, s) => a + (100 - s) * rule.weight, 0);
-    return { rule, zeros, avgScore, loss, avgLoss: loss / n };
-  }).sort((a, b) => b.loss - a.loss);
-
-  const weakest = `
+  // ---- 分城对比：两城并排，一眼看出差异（2026-08-16 用户要求） ----
+  const cities = [...new Set(rows.map((r) => r.v.city))].sort();
+  const statOf = (sub) => {
+    const c = Object.fromEntries(LEVELS.map((l) => [l, sub.filter((r) => r.v.level === l).length]));
+    const risk = new Set(sub.filter((r) => r.v.level === "C" || r.v.redline || r.v.double_zero)
+      .map((r) => r.v.vendor_code));
+    return {
+      n: sub.length,
+      avg: sub.reduce((s, r) => s + r.adjusted, 0) / (sub.length || 1),
+      counts: c,
+      sa: ((c.S + c.A) / (sub.length || 1)) * 100,
+      risk: risk.size,
+    };
+  };
+  const cityStats = cities.map((city) => ({ city, ...statOf(rows.filter((r) => r.v.city === city)) }));
+  const cityRow = (label, s, bold) => `
+    <tr>
+      <td class="${bold ? "fw" : ""}">${label}</td>
+      <td class="n num">${fmtNumber(s.n)}</td>
+      <td class="n num ${bold ? "fw" : ""}">${fmtPoints(s.avg)}</td>
+      ${LEVELS.map((l) => `<td class="n num">${s.counts[l] || "—"}</td>`).join("")}
+      <td class="n num ${bold ? "fw" : ""}">${fmtNumber(s.sa, { maximumFractionDigits: 0 })}%</td>
+      <td class="n num${s.risk ? " pf-risk" : ""}">${s.risk}</td>
+    </tr>`;
+  const byCity = cities.length < 2 ? "" : `
   <div class="card">
-    <h3 class="fw" style="margin-bottom:12px">${t("portfolio.weakest_title")}</h3>
-    <ul style="padding-left:20px" class="muted">
-      ${weakStats.slice(0, 3).map((w) => `<li style="margin-bottom:6px">${t("portfolio.weakest_row", {
-        indicator: t(`indicator.${w.rule.key}`),
-        n: fmtNumber(w.zeros),
-        avg: fmtNumber(w.avgScore, { maximumFractionDigits: 0 }),
-        loss: fmtPoints(w.avgLoss),
-      })}</li>`).join("")}
-    </ul>
+    <h3 class="fw" style="margin-bottom:12px">${t("portfolio.by_city_title")}</h3>
+    <div class="table-scroll"><table>
+      <thead><tr>
+        <th>${t("portfolio.h.city")}</th><th class="n">${t("portfolio.h.count")}</th>
+        <th class="n">${t("portfolio.h.avg_points")}</th>
+        ${LEVELS.map((l) => `<th class="n">${l}</th>`).join("")}
+        <th class="n">${t("portfolio.kpi_sa")}</th><th class="n">${t("portfolio.kpi_risk")}</th>
+      </tr></thead>
+      <tbody>
+        ${cityStats.map((s) => cityRow(s.city, s, false)).join("")}
+        ${cityRow(t("portfolio.total_row"), statOf(rows), true)}
+      </tbody>
+    </table></div>
   </div>`;
 
-  // ---- 逐家明细 ----
-  const listRows = rows.map((r) => {
+  // ---- 作用域切换：全部 / 各城。指标分布与逐家明细共用同一个切换 ----
+  const scopes = [{ key: "all", label: t("portfolio.scope_all_btn"), sub: rows },
+    ...cities.map((city) => ({ key: city, label: city, sub: rows.filter((r) => r.v.city === city) }))];
+  const scopeBar = scopes.length < 2 ? "" : `
+    <div class="pf-scope">
+      ${scopes.map((s, i) => `<button type="button" class="scope-btn pf-scope-btn${i === 0 ? " active" : ""}"
+        data-scope="${s.key}">${s.label} <span class="faint num">${s.sub.length}</span></button>`).join("")}
+    </div>`;
+
+  // ---- 各指标得分分布：每一档各多少家（只给平均分看不出结构） ----
+  const distTable = (sub) => {
+    const m = sub.length || 1;
+    const stats = activeIndicators(rules).map((rule) => {
+      const scores = sub.map((r) => r.scores[rule.key]);
+      const tiers = [...new Set(scores)].length ? null : null;
+      // 档位分值从规则里取（复合指标取其分项档位），不写死 100/80/50/0
+      const tierScores = [...new Set((rule.composite
+        ? rule.composite.components[0].tiers : rule.tiers).map((x) => x.score))].sort((a, b) => b - a);
+      return {
+        rule, tierScores,
+        buckets: tierScores.map((sc) => scores.filter((x) => x === sc).length),
+        avg: scores.reduce((a, b) => a + b, 0) / m,
+        avgLoss: scores.reduce((a, s) => a + (100 - s) * rule.weight, 0) / m,
+      };
+    }).sort((a, b) => b.avgLoss - a.avgLoss);
+    const allTiers = [...new Set(stats.flatMap((s) => s.tierScores))].sort((a, b) => b - a);
+    return `
+    <div class="table-scroll"><table>
+      <thead><tr>
+        <th>${t("portfolio.h.indicator")}</th>
+        ${allTiers.map((sc) => `<th class="n">${t("advice.sim_tier_score", { score: fmtNumber(sc) })}</th>`).join("")}
+        <th class="n">${t("portfolio.h.avg_score")}</th>
+        <th class="n">${t("portfolio.h.avg_loss")}</th>
+      </tr></thead>
+      <tbody>
+        ${stats.map((s) => `
+        <tr>
+          <td><span class="fw">${t(`indicator.${s.rule.key}`)}</span>
+              <span class="faint small num"> ${fmtNumber(s.rule.weight * 100)}%</span></td>
+          ${allTiers.map((sc) => {
+            const i = s.tierScores.indexOf(sc);
+            if (i < 0) return `<td class="n faint">—</td>`;
+            const cnt = s.buckets[i];
+            return `<td class="n num${sc === 0 && cnt ? " pf-risk" : ""}">${cnt
+              ? `${cnt}<span class="faint small"> ${fmtNumber((cnt / m) * 100, { maximumFractionDigits: 0 })}%</span>`
+              : `<span class="faint">0</span>`}</td>`;
+          }).join("")}
+          <td class="n num fw">${fmtNumber(s.avg, { maximumFractionDigits: 0 })}</td>
+          <td class="n num">${fmtPoints(s.avgLoss)}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table></div>`;
+  };
+
+  const distByScore = `
+  <div class="card">
+    <div class="pf-head">
+      <h3 class="fw">${t("portfolio.score_dist_title")}</h3>
+      <span class="faint small">${t("portfolio.score_dist_note")}</span>
+    </div>
+    ${scopeBar}
+    ${scopes.map((s, i) => `<div class="pf-scoped" data-scope="${s.key}"${i ? ' hidden' : ''}>${
+      distTable(s.sub)}</div>`).join("")}
+  </div>`;
+
+  // ---- 逐家明细：按作用域分别排名（2026-08-16 用户要求分城看） ----
+  const listRows = (sub) => sub.map((r, i) => {
     const flags = [
       r.v.redline ? `<span class="chip alert">${t("portfolio.risk_redline")}</span>` : "",
       r.v.double_zero ? `<span class="chip">${t("portfolio.risk_dz")}</span>` : "",
@@ -118,8 +202,9 @@ export function renderPortfolio({ rules, roster, profilesByCode, period, scopeLa
       : r.v.level_change === "↓" ? `<span class="pf-down">↓</span>` : `<span class="faint">—</span>`;
     return `
     <tr class="pf-row" data-vendor="${r.v.vendor_code}" tabindex="0" role="button">
-      <td><span class="fw">${r.p?.display_name ?? r.v.vendor_code}</span>
-          <div class="faint small num">${r.v.city}${isAll ? ` · ${r.p?.rm ?? t("common.rm_unassigned")}` : ""}</div></td>
+      <td class="n num faint">${i + 1}</td>
+      <td><span class="fw num">${r.v.vendor_code}</span>
+          <div class="faint small">${r.v.city}${isAll ? ` · ${r.p?.rm ?? t("common.rm_unassigned")}` : ""}</div></td>
       <td>${badgeSmall(r.v.level, 20)}</td>
       <td class="n num fw">${fmtPoints(r.adjusted)}</td>
       <td class="n">${chg}</td>
@@ -131,19 +216,22 @@ export function renderPortfolio({ rules, roster, profilesByCode, period, scopeLa
 
   const list = `
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:16px;flex-wrap:wrap">
+    <div class="pf-head">
       <h3 class="fw">${t("portfolio.list_title")}</h3>
-      <span class="faint small">${t("portfolio.flags_legend")}</span>
       <span class="faint small">${t("portfolio.sort_hint")}</span>
     </div>
-    <div class="table-scroll"><table>
-      <thead><tr>
-        <th>${t("portfolio.h.vendor")}</th><th>${t("portfolio.h.level")}</th>
-        <th class="n">${t("portfolio.h.points")}</th><th class="n">${t("portfolio.h.change")}</th>
-        <th>${t("portfolio.h.weakest")}</th><th>${t("portfolio.h.flags")}</th><th></th>
-      </tr></thead>
-      <tbody>${listRows}</tbody>
-    </table></div>
+    <p class="faint small" style="margin-bottom:12px">${t("portfolio.flags_legend")}</p>
+    ${scopeBar}
+    ${scopes.map((s, i) => `<div class="pf-scoped" data-scope="${s.key}"${i ? ' hidden' : ''}>
+      <div class="table-scroll"><table>
+        <thead><tr>
+          <th class="n">${t("portfolio.h.rank")}</th>
+          <th>${t("portfolio.h.vendor")}</th><th>${t("portfolio.h.level")}</th>
+          <th class="n">${t("portfolio.h.points")}</th><th class="n">${t("portfolio.h.change")}</th>
+          <th>${t("portfolio.h.weakest")}</th><th>${t("portfolio.h.flags")}</th><th></th>
+        </tr></thead>
+        <tbody>${listRows(s.sub)}</tbody>
+      </table></div></div>`).join("")}
   </div>`;
 
   return `
@@ -153,13 +241,27 @@ export function renderPortfolio({ rules, roster, profilesByCode, period, scopeLa
       scope: scopeLabel, n: fmtNumber(n), period: period.label })}</p>
     ${kpi}
     ${distBar}
-    ${weakest}
+    ${byCity}
+    ${distByScore}
   </section>
   <section class="section">${list}</section>`;
 }
 
 /** 点行/点按钮 → 切到该商详情（由 app.js 提供跳转回调） */
 export function bindPortfolio(onPick) {
+  // 作用域切换（全部 / 各城）：指标分布与逐家明细共用。三份表格已在渲染时算好，
+  // 这里只切显示——不在客户端重算，省得把数据再传一份进来、多一处可能不同步的状态
+  document.querySelectorAll(".pf-scope-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const scope = btn.dataset.scope;
+      document.querySelectorAll(".pf-scope-btn").forEach((b) =>
+        b.classList.toggle("active", b.dataset.scope === scope));
+      document.querySelectorAll(".pf-scoped").forEach((el) => {
+        el.hidden = el.dataset.scope !== scope;
+      });
+    });
+  });
+
   const go = (code) => { if (code) onPick(code); };
   document.querySelectorAll(".pf-view").forEach((b) =>
     b.addEventListener("click", (e) => { e.stopPropagation(); go(b.dataset.vendor); }));

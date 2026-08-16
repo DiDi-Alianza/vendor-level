@@ -496,5 +496,18 @@
   "admin.history.local_only": "历史版本备份保存在本地 rules_history/ 目录，线上不可见。回滚同样走变更单流程。",
   "admin.online_note": "线上模式：本页的试算、沙盘与数据查看可正常使用；规则的保存与回滚已停用——规则以 data/rules.json 为唯一事实来源，改动走变更单流程后重新导入。",
   "advice.sim_row_upgrade": "→ 做到这一档就能升到 {level} 级",
-  "portfolio.flags_legend": "状态说明：红线 = 当月触发欠款红线，现金激励冻结｜单量·排班双 0 = 日均完美单量与 Slot 达成率两项均为 0 分（缺的是业务量，不是服务质量）｜保护期 = 新商保护期内，C 级不计入清退累计"
+  "portfolio.flags_legend": "状态说明：红线 = 当月触发欠款红线，现金激励冻结｜单量·排班双 0 = 日均完美单量与 Slot 达成率两项均为 0 分（缺的是业务量，不是服务质量）｜保护期 = 新商保护期内，C 级不计入清退累计",
+  "nav.overview_internal": "单商详情",
+  "portfolio.by_city_title": "分城对比",
+  "portfolio.total_row": "合计",
+  "portfolio.h.city": "城市",
+  "portfolio.h.count": "家数",
+  "portfolio.h.avg_points": "平均 POINTS",
+  "portfolio.h.rank": "#",
+  "portfolio.h.indicator": "指标",
+  "portfolio.h.avg_score": "平均分",
+  "portfolio.h.avg_loss": "平均每家少拿",
+  "portfolio.score_dist_title": "各指标得分分布",
+  "portfolio.score_dist_note": "每一档各有多少家、占多大比例——只看平均分看不出结构。按「平均每家少拿」从多到少排列。",
+  "portfolio.scope_all_btn": "全部"
 }

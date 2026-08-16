@@ -258,9 +258,13 @@ function shell(route, content, { profile }) {
     ? `<div class="draft-banner weekly" role="status">${t("banner.weekly_trial")}</div>` : "";
 
   const navItems = NAV_FOR_ROLE[state.role].map((r) => {
-    const href = r === "overview" ? "#/" : `#/${r}`;
+    // 每个路由都写成显式 hash。曾用 "#/" 指代 overview，但内部角色的空 hash 会被
+    // currentRoute() 解析成 portfolio，导致点「我的等级」原地不动、看起来像按钮坏了
+    const href = `#/${r}`;
     const current = route === r ? ' aria-current="page"' : "";
-    return `<a href="${href}"${current}>${t(`nav.${r}`)}</a>`;
+    // 内部角色看的是「当前选中的那家商」，不是自己的等级 → 换个说法，免得费解
+    const key = r === "overview" && state.role !== "vendor" ? "nav.overview_internal" : `nav.${r}`;
+    return `<a href="${href}"${current}>${t(key)}</a>`;
   }).join("");
 
   const roleOptions = ["vendor", "rm", "ops", "admin"]
@@ -287,7 +291,8 @@ function shell(route, content, { profile }) {
     return {
       code: v.vendor_code,
       city: v.city,
-      label: internalRole ? `${name} · ${v.city} · ${v.vendor_code}` : `${name} · ${v.city}`,
+      // 显示统一用 vendor_code（多数显示名是法人姓名，与商号无字面关系，两套叫法反而更乱）
+      label: `${v.vendor_code} · ${v.city}`,
       haystack: normalizeSearch(`${name} ${v.vendor_code} ${v.city}`),
     };
   });

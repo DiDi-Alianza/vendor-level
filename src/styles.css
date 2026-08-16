@@ -686,3 +686,22 @@ tr:last-child td { border-bottom: none; }
 /* 能一步升级的那一行就地标注——这是全页最可操作的一句话，给它唯一的强调色 */
 .sim-next.can-upgrade { color: var(--ink-2); }
 .sim-upgrade-mark { color: var(--action); font-weight: 600; }
+
+/* RM 全盘：作用域切换与分布表 */
+.pf-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.pf-scope { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.pf-scope .pf-scope-btn.active {
+  background: var(--ink);
+  color: var(--page);
+  border-color: var(--ink);
+}
+.pf-scope .pf-scope-btn.active .faint { color: var(--page); opacity: .7; }
+/* 0 分档与风险家数用警示色：这里的颜色承载「需要处理」的信息 */
+.pf-risk { color: var(--alert); }
