@@ -149,7 +149,7 @@
   "tier.range": "{a} – {b}",
   "tier.zero": "0",
   "rules.title": "等级体系与规则公示",
-  "rules.subtitle": "本页全部内容由规则文件（{version} · {status}）自动渲染，规则更新后本页自动同步",
+  "rules.subtitle": "本页全部内容由规则文件（{version}）自动渲染，规则更新后本页自动同步",
   "rules.status.draft": "内部测算稿",
   "rules.status.active": "已生效",
   "rules.status.superseded": "已被新版本取代",

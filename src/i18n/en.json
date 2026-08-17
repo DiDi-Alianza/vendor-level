@@ -168,7 +168,7 @@
   "tier.range": "{a} – {b}",
   "tier.zero": "0",
   "rules.title": "Level system and published rules",
-  "rules.subtitle": "Everything on this page is rendered automatically from the rules file ({version} · {status}); when the rules change, this page follows",
+  "rules.subtitle": "Everything on this page is rendered automatically from the rules file ({version}); when the rules change, this page follows",
   "rules.status.draft": "Internal preliminary calculation",
   "rules.status.active": "In effect",
   "rules.status.superseded": "Superseded by a newer version",

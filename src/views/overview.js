@@ -37,8 +37,8 @@ export function renderOverview({ rules, vendor, profile, period, stats }) {
       ${badgeLarge(vendor.level, 150)}
       <div class="hero-main">
         <div class="hero-kicker">${t(period.type === "weekly" ? "overview.kicker_weekly" : "overview.kicker", { period: period.weeks ?? period.label })}</div>
-        <div class="points-label">${t("common.points")}${
-          rules.status === "draft" ? ` <span class="badge-corner">${t("badge.draft_tag")}</span>` : ""}</div>
+        <!-- 「测算稿」角标于 2026-08-17 随顶部横幅一并下线，见 app.js 处的说明 -->
+        <div class="points-label">${t("common.points")}</div>
         <div class="num-lg num">${fmtPoints(displayTotal)}</div>
         ${(flex.bonus || flex.penalty) ? `
         <div class="small num" style="margin-top:4px">

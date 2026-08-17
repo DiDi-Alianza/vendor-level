@@ -357,10 +357,7 @@ export function renderRules({ rules, viewer }) {
   return `
   <section class="section">
     <h2 class="page-title">${t("rules.title")}</h2>
-    <p class="faint">${t("rules.subtitle", {
-      version: rules.version,
-      status: t(`rules.status.${rules.status}`),
-    })}</p>
+    <p class="faint">${t("rules.subtitle", { version: rules.version })}</p>
   </section>
   ${indicatorsSection(rules)}
   ${levelsSection(rules, viewer)}

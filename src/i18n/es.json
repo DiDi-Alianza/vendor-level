@@ -164,7 +164,7 @@
   "tier.range": "{a} – {b}",
   "tier.zero": "0",
   "rules.title": "Sistema de Niveles y reglas publicadas",
-  "rules.subtitle": "Todo el contenido de esta página se genera automáticamente a partir del archivo de reglas ({version} · {status}); cuando las reglas cambian, esta página se actualiza sola",
+  "rules.subtitle": "Todo el contenido de esta página se genera automáticamente a partir del archivo de reglas ({version}); cuando las reglas cambian, esta página se actualiza sola",
   "rules.status.draft": "Cálculo interno preliminar",
   "rules.status.active": "Vigente",
   "rules.status.superseded": "Reemplazada por una versión más nueva",

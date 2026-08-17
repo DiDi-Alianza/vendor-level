@@ -270,8 +270,13 @@ function render() {
 }
 
 function shell(route, content, { profile }) {
-  const draftBanner = rules.status === "draft"
-    ? `<div class="draft-banner" role="status">${t("banner.draft")}</div>` : "";
+  // 「内部测算稿，未正式生效」横幅已于 2026-08-17 按运营要求下线。
+  // 恢复：把下面一行换回
+  //   rules.status === "draft" ? `<div class="draft-banner" role="status">${t("banner.draft")}</div>` : ""
+  // 文案键 banner.draft 与样式 .draft-banner 都保留着，恢复只需改这一行。
+  // ⚠️ 发放 Vendor 账号前请确认是否要恢复——当前展示的是按 2026-09 生效规则算出的历史月份，
+  //    对商开放时若无任何标识，商家会当成已生效的正式等级（原铁律 14 的用意）。
+  const draftBanner = "";
   const weeklyBanner = period?.type === "weekly"
     ? `<div class="draft-banner weekly" role="status">${t("banner.weekly_trial")}</div>` : "";
 
